@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: ecore-audio-cxx
 Description: E core library, audio module C++ API
-Requires.private: @requirements_pc_ecore_audio@ @requirements_pc_ecore_audio_cxx@
+Requires.private: @requirements_pc_ecore_audio@
 Version: @VERSION@
 Libs: -L${libdir} -lecore_audio
 Libs.private: @requirements_libs_ecore_audio@

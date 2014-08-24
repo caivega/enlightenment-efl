@@ -11,7 +11,7 @@ eolian_flags=-I${eoincludedir}/ecore-@VMAJ@
 
 Name: ecore C++ API
 Description: Ecore event abstraction library C++ API
-Requires.private: @requirements_pc_ecore@ @requirements_pc_ecore_cxx@
+Requires.private: @requirements_pc_ecore@
 Version: @VERSION@
 Libs: -L${libdir} -lecore
 Libs.private: @requirements_libs_ecore@

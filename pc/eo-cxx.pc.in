@@ -10,7 +10,7 @@ eolian_flags=-I${eoincludedir}/eo-@VMAJ@
 Name: Eo C++
 Description: C++ bindings for EFL's generic object system.
 Version: @PACKAGE_VERSION@
-Requires.private: @requirements_pc_eo@ @requirements_pc_eo_cxx@
+Requires.private: @requirements_pc_eo@
 Libs.private: @requirements_libs_eo@
 Libs: -L${libdir} -leo
 Cflags: -I${includedir}/efl-@VMAJ@ -I${includedir}/eo-@VMAJ@ -I${includedir}/eo-cxx-@VMAJ@

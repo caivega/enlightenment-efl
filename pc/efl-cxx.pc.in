@@ -10,7 +10,7 @@ eolian_flags=-I${eoincludedir}/efl-@VMAJ@
 Name: EFL++
 Description: EFL's C++ bindings
 Version: @PACKAGE_VERSION@
-Requires.private: @requirements_pc_efl@ @requirements_pc_efl_cxx@
+Requires.private: @requirements_pc_efl@
 Libs: -L${libdir} -lefl
 Libs.private:
 Cflags: -I${includedir}/efl-@VMAJ@ -I${includedir}/efl-cxx-@VMAJ@
