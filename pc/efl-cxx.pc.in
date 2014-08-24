@@ -13,4 +13,4 @@ Version: @PACKAGE_VERSION@
 Requires.private: @requirements_pc_efl@
 Libs: -L${libdir} -lefl
 Libs.private:
-Cflags: -I${includedir}/efl-@VMAJ@ -I${includedir}/efl-cxx-@VMAJ@
+Cflags: -I${includedir}/efl-@VMAJ@ -I${includedir}/efl-@VMAJ@/interfaces -I${includedir}/efl-cxx-@VMAJ@
