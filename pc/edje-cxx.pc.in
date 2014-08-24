@@ -16,7 +16,7 @@ eolian_flags=-I${eoincludedir}/edje-@VMAJ@
 
 Name: edje C++ API
 Description: Enlightened graphical design and layout engine C++ API.
-Requires.private: @requirements_pc_edje@
+Requires.private: @requirements_pc_edje@ @requirements_pc_edje_cxx@
 Version: @VERSION@
 Libs: -L${libdir} -ledje
 Libs.private: @requirements_libs_edje@

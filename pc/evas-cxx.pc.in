@@ -5,11 +5,11 @@ includedir=@includedir@
 datarootdir=@datarootdir@
 datadir=@datadir@
 eoincludedir=@datadir@/eolian/include
-eolian_flags=-I${eoincludedir}/evas-cxx-@VMAJ@
+eolian_flags=-I${eoincludedir}/evas-@VMAJ@
 
 Name: evas
-Description: Evas C++ Bindings
-Requires.private: @requirements_pc_evas@
+Description: Evas C++ bindings
+Requires.private: @requirements_pc_evas@ @requirements_pc_evas_cxx@
 Version: @VERSION@
 Libs: -L${libdir} -levas
 Libs.private: @requirements_libs_evas@
