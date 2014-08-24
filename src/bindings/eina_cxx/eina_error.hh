@@ -3,6 +3,7 @@
 
 #include <Eina.h>
 
+#include <cstdio>
 #include <system_error>
 
 /**
@@ -239,7 +240,11 @@ inline void throw_on_error()
   eina::error_code ec = get_error_code();
   if(ec)
   {
-    throw eina::system_error(ec, "EFL Eina Error");
+#ifdef __EXCEPTIONS     
+     throw eina::system_error(ec, "EFL Eina Error");
+#else
+     abort();
+#endif    
   }
 }
 
