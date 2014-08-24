@@ -494,7 +494,7 @@ _eo_free_ids_tables(void)
 }
 
 #ifdef EFL_DEBUG
-static inline void
+inline void
 _eo_print(void)
 {
    _Eo_Id_Entry *entry;
