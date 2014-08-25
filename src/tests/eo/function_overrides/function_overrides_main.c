@@ -47,7 +47,7 @@ main(int argc, char *argv[])
 
 #ifdef EO_DEBUG
    eo_do(obj, called = simple_class_print());
-   fail_if(called);
+   fail_if(!called);
 #endif
 
    eo_do(SIMPLE_CLASS, called = simple_class_print());
