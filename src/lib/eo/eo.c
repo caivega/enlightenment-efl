@@ -1486,6 +1486,11 @@ eo_xref_internal(const char *file, int line, Eo *obj_id, const Eo *ref_obj_id)
    xref->line = line;
 
    obj->xrefs = eina_inlist_prepend(obj->xrefs, EINA_INLIST_GET(xref));
+
+   printf("<< xref = ++ref >> %s() +%d XXX (%p:%s) -> (%p:%s)\n",
+          __FUNCTION__, __LINE__,
+          ref_obj_id, eo_class_name_get(eo_class_get(ref_obj_id)),
+          obj_id, eo_class_name_get(eo_class_get(obj_id)));
 #else
    (void) ref_obj_id;
    (void) file;
@@ -1500,6 +1505,11 @@ eo_xunref(Eo *obj_id, const Eo *ref_obj_id)
 {
    EO_OBJ_POINTER_RETURN(obj_id, obj);
 #ifdef EO_DEBUG
+   printf("<< xunref = --ref >> %s() +%d XXX (%p:%s) -> (%p:%s)\n",
+          __FUNCTION__, __LINE__,
+          ref_obj_id, eo_class_name_get(eo_class_get(ref_obj_id)),
+          obj_id, eo_class_name_get(eo_class_get(obj_id)));
+
    Eo_Xref_Node *xref = NULL;
    EINA_INLIST_FOREACH(obj->xrefs, xref)
      {
@@ -1543,6 +1553,10 @@ eo_unref(const Eo *obj_id)
 EAPI void
 eo_del(const Eo *obj)
 {
+   printf("<< eo.c >> %s() +%d XXX (%p:%s)\n",
+          __FUNCTION__, __LINE__,
+          obj, eo_class_name_get(eo_class_get(obj)));
+
    EO_OBJ_POINTER_RETURN(obj, _obj);
    eo_do((Eo *) obj, eo_parent_set(NULL));
    eo_unref(obj);
@@ -1853,6 +1867,11 @@ eo_composite_attach(Eo *comp_obj_id, Eo *parent_id)
    EO_OBJ_POINTER_RETURN_VAL(comp_obj_id, comp_obj, EINA_FALSE);
    EO_OBJ_POINTER_RETURN_VAL(parent_id, parent, EINA_FALSE);
 
+   printf("<< xunref = --ref >> %s() +%d XXX (%p:%s) -> (%p:%s)\n",
+          __FUNCTION__, __LINE__,
+          parent_id, eo_class_name_get(eo_class_get(parent_id)),
+          comp_obj_id, eo_class_name_get(eo_class_get(comp_obj_id)));
+
    if (!eo_isa(parent_id, _eo_class_id_get(comp_obj->klass))) return EINA_FALSE;
 
      {
@@ -1916,6 +1935,10 @@ eo_manual_free_set(Eo *obj_id, Eina_Bool manual_free)
 EAPI Eina_Bool
 eo_manual_free(Eo *obj_id)
 {
+   printf("<< eo.c >> %s() +%d XXX (%p:%s)\n",
+          __FUNCTION__, __LINE__,
+          obj_id, eo_class_name_get(eo_class_get(obj_id)));
+
    EO_OBJ_POINTER_RETURN_VAL(obj_id, obj, EINA_FALSE);
 
    if (EINA_FALSE == obj->manual_free)

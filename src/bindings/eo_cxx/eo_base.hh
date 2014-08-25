@@ -6,6 +6,8 @@
 #ifndef EFL_CXX_EO_BASE_HH
 #define EFL_CXX_EO_BASE_HH
 
+#include <iostream> // XXX
+
 #include <cassert>
 #include <stdexcept>
 #include <cstddef>
@@ -38,25 +40,38 @@ struct base
    ///
    explicit base(Eo* eo) : _eo_raw(eo)
    {
+      std::cout << "<< " << __FILE__ << "default " << ::eo_class_name_get(::eo_class_get(_eo_raw)) << " >> " 
+                << __FUNCTION__ << "() +" << __LINE__ 
+                << " XXX ref_count=" << ref_get() << std::endl << std::flush;
    }
 
    /// @brief Class destructor.
    ///
    ~base()
    {
-      if(_eo_raw)
-        detail::unref(_eo_raw);
+      std::cout << "<< " << __FILE__ << " del@" << ::eo_class_name_get(::eo_class_get(_eo_raw)) << " >> " 
+                << __FUNCTION__ << "() +" << __LINE__ 
+                << " XXX ref_count=" << ref_get() << std::endl << std::flush;
+      if (_eo_raw)
+         detail::unref(_eo_raw); /// XXX detail::del() ?
    }
 
    base(base const& other)
    {
+      std::cout << "<< " << __FILE__ << "base const& other "
+                << ::eo_class_name_get(::eo_class_get(other._eo_ptr())) << " >> " 
+                << __FUNCTION__ << "() +" << __LINE__ 
+                << " XXX ref_count=" << ref_get() << std::endl << std::flush;
      if(other._eo_raw)
        _eo_raw = detail::ref(other._eo_raw);
    }
 
    base(base&& other)
    {
-     if(_eo_raw) detail::unref(_eo_raw);
+      std::cout << "<< "<< __FILE__ << " base&& other " << ::eo_class_name_get(::eo_class_get(other._eo_ptr())) << " >> " 
+                << __FUNCTION__ << "() +" << __LINE__ 
+                << " XXX ref_count=" << ref_get() << std::endl << std::flush;
+     if(_eo_raw) detail::unref(_eo_raw); // XXX if parent set parent_set(NULL)
      _eo_raw = other._eo_raw;
      other._eo_raw = nullptr;
    }
@@ -65,27 +80,38 @@ struct base
    ///
    base& operator=(base const& other)
    {
+      std::cout << "<< " << __FILE__ << "op= " << ::eo_class_name_get(::eo_class_get(_eo_raw)) << " >> " 
+                << __FUNCTION__ << "() +" << __LINE__ 
+                << " XXX ref_count=" << ref_get() << std::endl << std::flush;
       if(_eo_raw)
         {
-           detail::unref(_eo_raw);
+           detail::unref(_eo_raw); // XXX if parent set parent_set(NULL)
            _eo_raw = nullptr;
         }
       if(other._eo_raw)
-        _eo_raw = detail::ref(other._eo_raw);
+        {
+           _eo_raw = detail::ref(other._eo_raw);
+           std::cout << "<< " << __FILE__ << " op= " << ::eo_class_name_get(::eo_class_get(other._eo_raw)) << " >> " 
+                     << __FUNCTION__ << "() +" << __LINE__ 
+                     << " XXX ref_count=" << ref_get() << std::endl << std::flush;
+        }
       return *this;
    }
 
    base& operator=(base&& other)
    {
+      std::cout << "<< "<< __FILE__ <<" op= (&&) " << ::eo_class_name_get(::eo_class_get(_eo_raw)) << " >> " 
+                << __FUNCTION__ << "() +" << __LINE__ 
+                << " XXX ref_count=" << ref_get() << std::endl << std::flush;
       if(_eo_raw)
         {
-           detail::unref(_eo_raw);
+           detail::unref(_eo_raw); // XXX if parent set parent_set(NULL)
            _eo_raw = nullptr;
         }
       std::swap(_eo_raw, other._eo_raw);
       return *this;
    }
-  
+
    /// @brief Return a pointer to the <em>EO Object</em> stored in this
    /// instance.
    ///
@@ -101,11 +127,13 @@ struct base
    ///
    Eo* _release()
    {
+      std::cout << "<< "<< __FILE__ <<" >> " << __FUNCTION__ << "() +" << __LINE__ 
+                 << " XXX ref_count=" << ref_get() << std::endl;
      Eo* tmp = _eo_raw;
      _eo_raw = nullptr;
      return tmp;
    }
-  
+
    /// @brief Get the reference count of this object.
    ///
    /// @return The referencer count of this object.
@@ -118,6 +146,9 @@ struct base
    ///
    void parent_set(base parent)
    {
+      std::cout << "<< "<< __FILE__ << " parent_set " << ::eo_class_name_get(::eo_class_get(parent._eo_ptr())) << " >> " 
+                << __FUNCTION__ << "() +" << __LINE__ 
+                << " XXX ref_count=" << ref_get() << std::endl << std::flush;
       detail::parent_set(_eo_raw, parent._eo_ptr());
    }
 
@@ -132,6 +163,10 @@ struct base
       if(!r) return nullptr;
       else
         {
+           std::cout << "<< "<< __FILE__ <<" parent_get "
+                     << ::eo_class_name_get(::eo_class_get(r)) << " >> " 
+                     << __FUNCTION__ << "() +" << __LINE__ 
+                     << " XXX ref_count=" << ref_get() << std::endl << std::flush;
            detail::ref(r); // XXX eo_parent_get does not call eo_ref so we may.
            return base(r);
         }
@@ -229,7 +264,7 @@ namespace detail {
 
 template <typename T>
 struct extension_inheritance;
-  
+
 template<>
 struct extension_inheritance<base>
 {
@@ -238,6 +273,8 @@ struct extension_inheritance<base>
    {
       operator base() const
       {
+         std::cout << "<< "<< __FILE__ << " >> " << __FUNCTION__ << "() +" << __LINE__ 
+                   << " XXX " << std::endl;
          return base(eo_ref(static_cast<T const*>(this)->_eo_ptr()));
       }
 
@@ -259,10 +296,16 @@ struct extension_inheritance<base>
 template <typename T, typename U>
 T downcast(U object)
 {
-   Eo *eo = object._eo_ptr();
+   std::cout << "<< " << __FILE__ << " downcast@" << ::eo_class_name_get(::eo_class_get(object._eo_raw)) << " >> " 
+             << __FUNCTION__ << "() +" << __LINE__ 
+             << " XXX ref_count=" << object.ref_get() << std::endl << std::flush;
 
+   Eo *eo = object._eo_ptr();
    if(detail::isa(eo, T::_eo_class()))
      {
+        std::cout << "<< " << __FILE__ << " downcast@" << ::eo_class_name_get(::eo_class_get(object._eo_raw)) << " >> " 
+                  << __FUNCTION__ << "() +" << __LINE__ 
+                  << " XXX ref_count=" << object.ref_get() << std::endl << std::flush;
         return T(detail::ref(eo));
      }
    else

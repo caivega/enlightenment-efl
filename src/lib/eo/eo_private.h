@@ -200,12 +200,18 @@ Eo *_eo_id_get(const _Eo_Object *obj)
 static inline void
 _eo_condtor_reset(_Eo_Object *obj)
 {
+   printf("<< %p : %s  >> %s() +%d XXX refcount=%d\n",
+          obj, obj->klass->desc->name, __FUNCTION__, __LINE__, obj->refcount);
+
    obj->condtor_done = EINA_FALSE;
 }
 
 static inline void
 _eo_del_internal(const char *file, int line, _Eo_Object *obj)
 {
+   printf("<< %p : %s >> %s() +%d XXX refcount=%d\n",
+          obj, obj->klass->desc->name, __FUNCTION__, __LINE__, obj->refcount);
+
    /* We need that for the event callbacks that may ref/unref. */
    obj->refcount++;
 
@@ -240,6 +246,9 @@ _eo_del_internal(const char *file, int line, _Eo_Object *obj)
 static inline void
 _eo_free(_Eo_Object *obj)
 {
+   printf("<< %p : %s >> %s() +%d XXX refcount=%d\n",
+          obj, obj->klass->desc->name, __FUNCTION__, __LINE__, obj->refcount);
+
    _Eo_Class *klass = (_Eo_Class*) obj->klass;
 
 #ifdef EO_DEBUG
@@ -266,6 +275,9 @@ _eo_free(_Eo_Object *obj)
 static inline _Eo_Object *
 _eo_ref(_Eo_Object *obj)
 {
+   printf("<< %p : %s >> %s() +%d XXX refcount=%d\n",
+          obj, obj->klass->desc->name, __FUNCTION__, __LINE__, obj->refcount);
+
    obj->refcount++;
    return obj;
 }
@@ -273,6 +285,9 @@ _eo_ref(_Eo_Object *obj)
 static inline void
 _eo_unref(_Eo_Object *obj)
 {
+   printf("<< %p : %s >> %s() +%d XXX refcount=%d\n",
+          obj, obj->klass->desc->name, __FUNCTION__, __LINE__, obj->refcount);
+
    --(obj->refcount);
    if (obj->refcount == 0)
      {
