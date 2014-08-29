@@ -4426,6 +4426,7 @@ pc/eo-cxx.pc
 pc/eolian.pc
 pc/eolian-cxx.pc
 pc/efl.pc
+pc/efl-cxx.pc
 pc/evas-fb.pc
 pc/evas-opengl-x11.pc
 pc/evas-opengl-sdl.pc
