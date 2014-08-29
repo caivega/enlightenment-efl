@@ -15,7 +15,10 @@ include $(top_srcdir)/src/Makefile_Eolian_Cxx_Helper.am
 AM_CXXFLAGS = \
 	-I$(srcdir) \
 	-I$(builddir) \
+	-I$(top_srcdir)/src/lib/efl \
 	-I$(top_builddir)/src/lib/efl \
+	-I$(top_srcdir)/src/lib/efl/interfaces \
+	-I$(top_builddir)/src/lib/efl/interfaces \
 	-I$(top_srcdir)/src/lib/eina \
 	-I$(top_builddir)/src/lib/eina \
 	-I$(top_srcdir)/src/lib/eo \
