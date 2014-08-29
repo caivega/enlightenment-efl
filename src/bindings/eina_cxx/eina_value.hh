@@ -64,10 +64,22 @@ struct _eina_value_traits_base
         if(::eina_value_get(v, &vv))
           return vv;
         else
-          throw eina::system_error(eina::get_error_code());
+	  {
+#if ! defined ( EFL_CXX_NO_EXCEPTIONS )
+	     throw eina::system_error(eina::get_error_code());
+#else
+	     abort();
+#endif
+	  }
       }
     else
-      throw eina::system_error(EINA_ERROR_VALUE_FAILED, eina::eina_error_category());
+      {
+#if ! defined ( EFL_CXX_NO_EXCEPTIONS )
+         throw eina::system_error(EINA_ERROR_VALUE_FAILED, eina::eina_error_category());
+#else
+         abort();
+#endif
+      }
   }
 };
 
@@ -445,7 +457,13 @@ public:
     : _raw(_eina_value_traits<char>::create())
   {
     if(!eina_value_copy(const_cast<Eina_Value const*>(other._raw), _raw))
-      throw eina::system_error(eina::get_error_code());
+      {
+#if ! defined ( EFL_CXX_NO_EXCEPTIONS )
+         throw eina::system_error(eina::get_error_code());
+#else
+         abort();
+#endif
+      }
   }
 
   /**
@@ -456,7 +474,13 @@ public:
   {
     eina_value_flush(_raw);
     if(!eina_value_copy(const_cast<Eina_Value const*>(other._raw), _raw))
-      throw eina::system_error(eina::get_error_code());
+      {
+#if ! defined ( EFL_CXX_NO_EXCEPTIONS )
+         throw eina::system_error(eina::get_error_code());
+#else
+         abort();
+#endif
+      }
     return *this;
   }
 

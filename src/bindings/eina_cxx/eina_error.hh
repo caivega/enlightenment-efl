@@ -239,7 +239,11 @@ inline void throw_on_error()
   eina::error_code ec = get_error_code();
   if(ec)
   {
-    throw eina::system_error(ec, "EFL Eina Error");
+#if ! defined ( EFL_CXX_NO_EXCEPTIONS )
+     throw eina::system_error(ec, "EFL Eina Error");
+#else
+     abort();
+#endif
   }
 }
 
