@@ -133,7 +133,7 @@ struct mutex
         abort();
 #endif
       default:
-#if ! defined ( __EXCEPTION )
+#if ! defined ( EFL_CXX_NO_EXCEPTIONS )
         throw system_error(get_error_code());
 #else
         abort();
