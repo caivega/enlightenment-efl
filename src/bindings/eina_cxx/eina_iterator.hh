@@ -204,6 +204,26 @@ public:
   }
 };
 
+/* proxy struct for neater iteration */
+template<typename T>
+struct iterator_iterator
+{
+   iterator_iterator(Eina_Iterator *iter): _iter(iter) {}
+
+   efl::eina::iterator<T> begin()
+   {
+      return efl::eina::iterator<T>(_iter);
+   }
+
+   efl::eina::iterator<T> end()
+   {
+      return efl::eina::iterator<T>();
+   }
+
+private:
+   Eina_Iterator* _iter;
+};
+
 /**
  * @}
  */

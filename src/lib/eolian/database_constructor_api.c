@@ -39,3 +39,16 @@ eolian_constructor_function_get(const Eolian_Constructor *ctor)
    return eolian_class_function_get_by_name(klass,
        ctor->full_name + strlen(klass->full_name) + 1, EOLIAN_UNRESOLVED);
 }
+
+EAPI const Eolian_Constructor *
+eolian_constructor_get_by_function(const Eolian_Class *klass, const Eolian_Function *func)
+{
+   Eina_Iterator *itr = eolian_class_constructors_get(klass);
+   Eolian_Constructor const* ctor_;
+   EINA_ITERATOR_FOREACH(itr, ctor_)
+     {
+        if (eolian_constructor_function_get(ctor_) == func)
+          return ctor_;
+     }
+   return NULL;
+}

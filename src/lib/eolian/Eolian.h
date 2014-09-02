@@ -1022,6 +1022,18 @@ EAPI const Eolian_Function *eolian_constructor_function_get(const Eolian_Constru
 EAPI Eina_Iterator *eolian_class_constructors_get(const Eolian_Class *klass);
 
 /*
+ * @brief Get the constructor object corresponding to the constructing
+ * function @c func of class @c klass.
+ *
+ * @param[in] klass the class.
+ * @param[in] func the constructing function.
+ * @return the constructor object
+ *
+ * @ingroup Eolian
+ */
+EAPI const Eolian_Constructor *eolian_constructor_get_by_function(const Eolian_Class *klass, const Eolian_Function *func);
+
+/*
  * @brief Get an iterator to the events defined in a class.
  *
  * @param[in] klass the class.

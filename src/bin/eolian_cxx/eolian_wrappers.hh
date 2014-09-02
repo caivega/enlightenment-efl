@@ -25,10 +25,6 @@ getter_t const getter = {};
 struct method_t { static constexpr ::Eolian_Function_Type value = ::EOLIAN_METHOD; };
 method_t const method = {};
 
-/* fixme */
-struct ctor_t { static constexpr ::Eolian_Function_Type value = ::EOLIAN_METHOD; };
-ctor_t const ctor = {};
-
 inline const Eolian_Class*
 class_from_file(std::string const& file)
 {
@@ -156,30 +152,25 @@ class_namespace_full(Eolian_Class const& klass)
    return safe_lower(s);
 }
 
-/* proxy struct for neater iteration */
-template<typename T>
-struct iterator_iterator
-{
-   iterator_iterator(Eina_Iterator *iter): p_iter(iter) {}
-
-   efl::eina::iterator<T> begin()
-   {
-      return efl::eina::iterator<T>(p_iter);
-   }
-
-   efl::eina::iterator<T> end()
-   {
-      return efl::eina::iterator<T>();
-   }
-
-private:
-   Eina_Iterator *p_iter;
-};
-
-inline iterator_iterator<const Eolian_Class>
+inline efl::eina::iterator_iterator<const Eolian_Class>
 class_list_all()
 {
-   return iterator_iterator<const Eolian_Class>(::eolian_all_classes_get());
+   return efl::eina::iterator_iterator<const Eolian_Class>(::eolian_all_classes_get());
+}
+
+inline efl::eina::iterator_iterator<const Eolian_Constructor>
+class_list_ctors(Eolian_Class const& cls)
+{
+   assert(!!::eolian_class_constructors_get(&cls));
+   return efl::eina::iterator_iterator<const Eolian_Constructor>
+   (::eolian_class_constructors_get(&cls));
+}
+
+inline Eolian_Function const&
+constructor_function(Eolian_Constructor const& ctor)
+{
+   assert(!!::eolian_constructor_function_get(&ctor));
+   return * ::eolian_constructor_function_get(&ctor);
 }
 
 inline std::string
@@ -198,9 +189,48 @@ function_impl(Eolian_Function const& func, std::string const& prefix)
 }
 
 inline Eolian_Function_Type
-function_type(Eolian_Function const& func)
+function_op_type(Eolian_Function const& func)
 {
    return ::eolian_function_type_get(&func);
+}
+
+inline efl::eolian::eo_function::eo_function_type
+function_type(Eolian_Function const& func)
+{
+   return ::eolian_function_is_class(&func)
+         ? efl::eolian::eo_function::class_
+         : efl::eolian::eo_function::regular_
+         ;
+}
+
+inline bool
+function_is_generated(Eolian_Function const& func, Eolian_Function_Type func_type)
+{
+   return (::eolian_function_scope_get(&func) == EOLIAN_SCOPE_PUBLIC &&
+           ! ::eolian_function_is_legacy_only(&func, func_type));
+}
+
+inline bool
+function_is_generated(Eolian_Function const& func)
+{
+   return function_is_generated(func, function_op_type(func));
+}
+
+inline bool
+function_is_generated(Eolian_Constructor const& ctor_)
+{
+   Eolian_Function const* func = ::eolian_constructor_function_get(&ctor_);
+   Eolian_Class const* cls = ::eolian_constructor_class_get(&ctor_);
+   assert(::eolian_class_ctor_enable_get(cls));
+   assert(!!cls);
+   assert(!!func);
+   return function_is_generated(*func, method_t::value);
+}
+
+inline bool
+function_is_constructing(Eolian_Class const& cls, Eolian_Function const& func)
+{
+   return ::eolian_constructor_get_by_function(&cls, &func) != NULL;
 }
 
 inline efl::eolian::eolian_type_instance
@@ -227,12 +257,6 @@ function_return_type(Eolian_Function const& func, method_t func_type)
    return function_return_type(func, func_type.value);
 }
 
-inline efl::eolian::eolian_type_instance
-function_return_type(Eolian_Function const& func, ctor_t func_type)
-{
-   return function_return_type(func, func_type.value);
-}
-
 inline bool
 function_return_is_explicit_void(Eolian_Function const& func, getter_t func_type)
 {
@@ -253,7 +277,7 @@ property_is_getter(Eolian_Function_Type func_type)
 inline bool
 property_is_getter(Eolian_Function const& func)
 {
-   return property_is_getter(function_type(func));
+   return property_is_getter(function_op_type(func));
 }
 
 inline bool
@@ -265,7 +289,7 @@ property_is_setter(Eolian_Function_Type func_type)
 inline bool
 property_is_setter(Eolian_Function const& func)
 {
-   return property_is_setter(function_type(func));
+   return property_is_setter(function_op_type(func));
 }
 
 inline std::string
@@ -309,7 +333,7 @@ inline bool
 parameter_is_const(Eolian_Function_Parameter const& parameter,
                    Eolian_Function const& func)
 {
-   assert(function_type(func) != EOLIAN_PROPERTY);
+   assert(function_op_type(func) != EOLIAN_PROPERTY);
    return ::eolian_parameter_const_attribute_get
      (&parameter, property_is_getter(func));
 }
@@ -377,6 +401,18 @@ event_list(Eolian_Class const& klass)
      }
    eina_iterator_free(itr);
    return events;
+}
+
+inline Eolian_Function const*
+implement_function(Eolian_Implement const& impl)
+{
+   return ::eolian_implement_function_get(&impl, nullptr);
+}
+
+inline Eolian_Class const*
+implement_class(Eolian_Implement const& impl)
+{
+   return ::eolian_implement_class_get(&impl);
 }
 
 }
