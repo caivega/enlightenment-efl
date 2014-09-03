@@ -93,9 +93,7 @@ tests/eolian/data/class_funcs.eo \
 tests/eolian/data/enum.eo \
 tests/eolian/data/free_func.eo
 
-EOS_GENERATED = \
-$(EOS:%.eo=%.eo.c)\
-$(EOS:%.eo=%.eo.h)
+EOS_GENERATED = $(EOS:%.eo=%.eo.c) $(EOS:%.eo=%.eo.h)
 
 check_PROGRAMS += \
 tests/eolian/eolian_suite
