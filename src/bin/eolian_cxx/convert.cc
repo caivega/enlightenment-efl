@@ -281,16 +281,20 @@ convert_eolian_implements(efl::eolian::eo_class& cls, Eolian_Class const& klass)
         const Eolian_Implement *impl_desc = static_cast<Eolian_Implement*>(impl_desc_);
         const Eolian_Function *impl_func = implement_function(*impl_desc);
         assert(!!impl_func);
-        if (function_is_constructing(klass, *impl_func) && function_is_generated(*impl_func))
-          {
-             efl::eolian::eo_constructor constructor; // XXX
-             std::string parent = class_full_name(*implement_class(*impl_desc));
-             if (parent == "eo_base" || parent == "eo.base") parent = "eo"; // XXX
-             constructor.name = parent + "_" + function_name(*impl_func);
-             constructor.params = _convert_eolian_parameters(*impl_func);
-             constructor.comment = convert_comments_function(klass, *impl_func);
-             cls.constructors.push_back(constructor);
-          }
+        assert(!!implement_class(*impl_desc));
+        if (!function_is_constructing(*implement_class(*impl_desc), *impl_func) ||
+            !function_is_generated(*impl_func))
+           continue;
+        std::string parent = safe_lower
+        (class_full_name(*implement_class(*impl_desc)));
+        if (parent == "eo.base") parent = "eo"; 
+        efl::eolian::eo_constructor ctor_ =
+        {
+           parent + "_" + function_name(*impl_func),
+           _convert_eolian_parameters(*impl_func),
+           convert_comments_function(klass, *impl_func)
+        };
+        cls.constructors.push_back(ctor_);
      }
    eina_iterator_free(itr);
 }
