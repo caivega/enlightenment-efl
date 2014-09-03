@@ -203,10 +203,11 @@ convert_eolian_inheritances(efl::eolian::eo_class& cls, Eolian_Class const& klas
 void
 convert_eolian_constructors(efl::eolian::eo_class& cls, Eolian_Class const& klass)
 {
-   efl::eina::iterator_iterator<const Eolian_Constructor> ctors(class_list_ctors(klass));
-   for (const Eolian_Constructor ctor : ctors)
+   efl::eina::iterator<const Eolian_Constructor> it = class_ctors(klass);
+   efl::eina::iterator<const Eolian_Constructor> end;
+   while (it != end)
      {
-        Eolian_Function const& func = constructor_function(ctor);
+        Eolian_Function const& func = constructor_function(*it);
         efl::eolian::eo_constructor ctor_ =
         {
            function_impl(func, class_prefix(klass)),
@@ -214,6 +215,7 @@ convert_eolian_constructors(efl::eolian::eo_class& cls, Eolian_Class const& klas
            convert_comments_function(klass, func)
         };
         cls.constructors.push_back(ctor_);
+        ++it;
      }
 }
 

@@ -157,12 +157,19 @@ class_list_all()
    return efl::eina::iterator_iterator<const Eolian_Class>(::eolian_all_classes_get());
 }
 
-inline efl::eina::iterator_iterator<const Eolian_Constructor>
-class_list_ctors(Eolian_Class const& cls)
+inline bool
+class_ctors_enabled(Eolian_Class const& cls)
 {
-   assert(!!::eolian_class_constructors_get(&cls));
-   return efl::eina::iterator_iterator<const Eolian_Constructor>
-   (::eolian_class_constructors_get(&cls));
+   return !!::eolian_class_constructors_get(&cls);
+}
+
+inline efl::eina::iterator<const Eolian_Constructor>
+class_ctors(Eolian_Class const& cls)
+{
+   if (class_ctors_enabled(cls))
+      return efl::eina::iterator<const Eolian_Constructor>
+      (::eolian_class_constructors_get(&cls));
+   return efl::eina::iterator<const Eolian_Constructor>();
 }
 
 inline Eolian_Function const&
