@@ -49,9 +49,10 @@ AM_LDFLAGS = \
   -L$(top_builddir)/src/lib/evas \
 	-L$(top_builddir)/src/lib/ecore \
 	-L$(top_builddir)/src/lib/ecore_evas \
-	-leina -levas -leo -lecore -lecore_evas -pthread
+	-lefl -leina -levas -leo -lecore -lecore_evas -pthread
 
 LDADD = \
+	$(top_builddir)/src/lib/efl/libefl.la \
 	$(top_builddir)/src/lib/eo/libeo.la \
 	$(top_builddir)/src/lib/eina/libeina.la \
 	$(top_builddir)/src/lib/evas/libevas.la \
