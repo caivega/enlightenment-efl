@@ -15,7 +15,6 @@ namespace eolian_cxx
 
 struct property_t { static constexpr ::Eolian_Function_Type value = ::EOLIAN_PROPERTY; };
 property_t const property = {};
-
 struct setter_t { static constexpr ::Eolian_Function_Type value = ::EOLIAN_PROP_SET; };
 setter_t const setter = {};
 
