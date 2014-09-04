@@ -151,10 +151,10 @@ class_namespace_full(Eolian_Class const& klass)
    return safe_lower(s);
 }
 
-inline efl::eina::iterator_iterator<const Eolian_Class>
+inline efl::eina::iterator<const Eolian_Class>
 class_list_all()
 {
-   return efl::eina::iterator_iterator<const Eolian_Class>(::eolian_all_classes_get());
+   return efl::eina::iterator<const Eolian_Class>(::eolian_all_classes_get());
 }
 
 inline bool
