@@ -84,8 +84,8 @@ convert_comments_function(Eolian_Class const& klass,
                           Eolian_Function_Type func_type)
 {
    std::string doc = _comment_brief_and_params(function);
-   if (!function_is_constructing(klass, function))
-      doc += _comment_return(function, func_type);
+   //if (!function_is_constructing(klass, function))
+   doc += _comment_return(function, func_type);
    return doc;
 }
 

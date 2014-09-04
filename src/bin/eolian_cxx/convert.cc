@@ -227,7 +227,8 @@ convert_eolian_functions(efl::eolian::eo_class& cls, Eolian_Class const& klass)
    efl::eina::iterator<const Eolian_Function> end;
    while (it != end)
      {
-        if (!function_is_constructing(klass, *it) && function_is_generated(*it))
+        if (//!function_is_constructing(klass, *it) &&
+            function_is_generated(*it, eolian_cxx::method))
           {
              efl::eolian::eo_function func_;
              func_.type = function_type(*it);
@@ -282,14 +283,16 @@ convert_eolian_implements(efl::eolian::eo_class& cls, Eolian_Class const& klass)
      {
         const Eolian_Implement *impl_desc = static_cast<Eolian_Implement*>(impl_desc_);
         const Eolian_Function *impl_func = implement_function(*impl_desc);
+        Eolian_Function_Type impl_type = function_op_type(*impl_func);
         assert(!!impl_func);
         assert(!!implement_class(*impl_desc));
-        if (!function_is_constructing(*implement_class(*impl_desc), *impl_func) ||
-            !function_is_generated(*impl_func))
+        if (impl_type != eolian_cxx::method.value ||
+           //!function_is_constructing(*implement_class(*impl_desc), *impl_func) ||
+           !function_is_generated(*impl_func, impl_type))
            continue;
         std::string parent = safe_lower
         (class_full_name(*implement_class(*impl_desc)));
-        if (parent == "eo.base") parent = "eo"; 
+        if (parent == "eo.base") parent = "eo";
         efl::eolian::eo_constructor ctor_ =
         {
            parent + "_" + function_name(*impl_func),
