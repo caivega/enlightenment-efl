@@ -222,21 +222,23 @@ convert_eolian_constructors(efl::eolian::eo_class& cls, Eolian_Class const& klas
 void
 convert_eolian_functions(efl::eolian::eo_class& cls, Eolian_Class const& klass)
 {
-   efl::eina::iterator_iterator<const Eolian_Function> funcs
+   efl::eina::iterator<const Eolian_Function> it
       (::eolian_class_functions_get(&klass, EOLIAN_METHOD));
-
-   for (auto it = funcs.begin(), end = funcs.end(); it != end; ++it)
+   efl::eina::iterator<const Eolian_Function> end;
+   while (it != end)
      {
-        if (function_is_constructing(klass, *it) || !function_is_generated(*it))
-           continue;
-        efl::eolian::eo_function func_;
-        func_.type = function_type(*it);
-        func_.name = function_name(*it);
-        func_.impl = function_impl(*it, class_prefix(klass));
-        func_.ret = function_return_type(*it);
-        func_.params = _convert_eolian_parameters(*it);
-        func_.comment = convert_comments_function(klass, *it, eolian_cxx::method);
-        cls.functions.push_back(func_);
+        if (!function_is_constructing(klass, *it) && function_is_generated(*it))
+          {
+             efl::eolian::eo_function func_;
+             func_.type = function_type(*it);
+             func_.name = function_name(*it);
+             func_.impl = function_impl(*it, class_prefix(klass));
+             func_.ret = function_return_type(*it);
+             func_.params = _convert_eolian_parameters(*it);
+             func_.comment = convert_comments_function(klass, *it, eolian_cxx::method);
+             cls.functions.push_back(func_);
+          }
+        ++it;
      }
 }
 
