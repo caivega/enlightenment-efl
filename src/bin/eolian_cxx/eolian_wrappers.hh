@@ -15,6 +15,7 @@ namespace eolian_cxx
 
 struct property_t { static constexpr ::Eolian_Function_Type value = ::EOLIAN_PROPERTY; };
 property_t const property = {};
+
 struct setter_t { static constexpr ::Eolian_Function_Type value = ::EOLIAN_PROP_SET; };
 setter_t const setter = {};
 
@@ -217,9 +218,10 @@ function_is_generated(Eolian_Function const& func, Eolian_Function_Type func_typ
 }
 
 inline bool
-function_is_generated(Eolian_Function const& func)
+function_is_generated(Eolian_Function const& func, method_t)
 {
-   return function_is_generated(func, function_op_type(func));
+   return (::eolian_function_scope_get(&func) == EOLIAN_SCOPE_PUBLIC &&
+           ! ::eolian_function_is_legacy_only(&func, method_t::value));
 }
 
 inline bool
@@ -231,12 +233,6 @@ function_is_generated(Eolian_Constructor const& ctor_)
    assert(!!cls);
    assert(!!func);
    return function_is_generated(*func, method_t::value);
-}
-
-inline bool
-function_is_constructing(Eolian_Class const& cls, Eolian_Function const& func)
-{
-   return ::eolian_constructor_get_by_function(&cls, &func) != NULL;
 }
 
 inline efl::eolian::eolian_type_instance
