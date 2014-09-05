@@ -279,7 +279,10 @@ _db_fill_implement(Eolian_Class *cl, Eolian_Implement *impl)
    else if (impl->is_prop_set)
      ftype = EOLIAN_PROP_SET;
 
-   if (!impl_name) return _func_error(cl, impl);
+   if (!impl_name)
+     {
+        INF("XXX impl_name is null for class %s", cl->name);
+     }
 
    if (impl->is_virtual)
      {
@@ -328,18 +331,18 @@ _db_fill_implement(Eolian_Class *cl, Eolian_Implement *impl)
    else if (impl->is_class_ctor)
      {
         cl->class_ctor_enable = EINA_TRUE;
-        const char *inm = impl_name;
-        if (inm[0] == '.') ++inm;
-        if (strchr(inm, '.')) goto pasttags;
-        Eolian_Function *foo_id = (Eolian_Function*)
-                                   eolian_class_function_get_by_name(cl,
-                                                                     impl_name,
-                                                                     ftype);
-        foo_id->ctor_of_classes =
-          eina_list_sorted_insert(foo_id->ctor_of_classes,
-                                  EINA_COMPARE_CB(strcmp),
-                                  eina_stringshare_ref(cl->name));
-        INF("XXX Fuction %s (type=%d) marked as constructor of class %s", impl_name, (int)ftype, cl->name);
+        /* if (!_get_impl_func(cl, impl, ftype, &foo_id)) */
+        /*   return _func_error(cl, impl); */
+        /* if (!foo_id) */
+        /*   { */
+        /*      INF("XXX foo_id is null for %s / %s", cl->name, (impl->full_name ? impl->full_name : "<null-name-impl>")); */
+        /*      goto pasttags; */
+        /*   } */
+        /* foo_id->ctor_of_classes = */
+        /*   eina_list_sorted_insert(foo_id->ctor_of_classes, */
+        /*                           EINA_COMPARE_CB(strcmp), */
+        /*                           eina_stringshare_ref(cl->name)); */
+        /* INF("XXX Fuction %s (type=%d) marked as constructor of class %s", impl_name, (int)ftype, cl->name); */
         return 1;
      }
    else if (impl->is_class_dtor)
