@@ -59,7 +59,10 @@ _db_fill_implement(Eolian_Class *cl, Eolian_Implement *impl)
    else if (impl->is_prop_set)
      ftype = EOLIAN_PROP_SET;
 
-   if (!impl_name) return _func_error(cl, impl);
+   if (!impl_name)
+     {
+        INF("XXX impl_name is null for class %s", cl->name);
+     }
 
    if (impl->is_virtual)
      {

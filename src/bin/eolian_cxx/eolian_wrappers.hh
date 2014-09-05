@@ -211,28 +211,41 @@ function_type(Eolian_Function const& func)
 }
 
 inline bool
-function_is_generated(Eolian_Function const& func, Eolian_Function_Type func_type)
+function_is_constructor(Eolian_Class const& cls, Eolian_Function const& func)
+{
+   return ::eolian_function_is_constructor(&func, &cls);
+}
+
+inline bool
+function_is_visible(Eolian_Function const& func, Eolian_Function_Type func_type)
 {
    return (::eolian_function_scope_get(&func) == EOLIAN_SCOPE_PUBLIC &&
            ! ::eolian_function_is_legacy_only(&func, func_type));
 }
 
 inline bool
-function_is_generated(Eolian_Function const& func, method_t)
+function_is_visible(Eolian_Function const& func, method_t)
 {
    return (::eolian_function_scope_get(&func) == EOLIAN_SCOPE_PUBLIC &&
            ! ::eolian_function_is_legacy_only(&func, method_t::value));
 }
 
 inline bool
-function_is_generated(Eolian_Constructor const& ctor_)
+function_is_visible(Eolian_Function const& func)
+{
+   return (::eolian_function_scope_get(&func) == EOLIAN_SCOPE_PUBLIC &&
+           ! ::eolian_function_is_legacy_only(&func, function_op_type(func)));
+}
+
+inline bool
+function_is_visible(Eolian_Constructor const& ctor_)
 {
    Eolian_Function const* func = ::eolian_constructor_function_get(&ctor_);
    Eolian_Class const* cls = ::eolian_constructor_class_get(&ctor_);
    assert(::eolian_class_ctor_enable_get(cls));
    assert(!!cls);
    assert(!!func);
-   return function_is_generated(*func, method_t::value);
+   return function_is_visible(*func, method_t::value);
 }
 
 inline efl::eolian::eolian_type_instance
@@ -406,15 +419,24 @@ event_list(Eolian_Class const& klass)
 }
 
 inline Eolian_Function const*
-implement_function(Eolian_Implement const& impl)
+implements_function(Eolian_Implement const& impl)
 {
    return ::eolian_implement_function_get(&impl, nullptr);
 }
 
 inline Eolian_Class const*
-implement_class(Eolian_Implement const& impl)
+implements_class(Eolian_Implement const& impl)
 {
    return ::eolian_implement_class_get(&impl);
+}
+
+inline bool
+implements_is_visible(Eolian_Class const& cls, Eolian_Implement const& impl)
+{
+   const Eolian_Function *func = implements_function(impl);
+   std::cout << "XXX " << class_full_name(cls) << " != " << class_full_name(*implements_class(impl)) << " ? R = "<< (class_full_name(cls) != class_full_name(*implements_class(impl))) << " implements_is_visible => " << (class_full_name(cls) != class_full_name(*implements_class(impl)) && function_is_visible(*func) && function_is_constructor(cls, *func)) << std::endl;
+   return class_full_name(cls) != class_full_name(*implements_class(impl)) &&
+     function_is_visible(*func) && function_is_constructor(cls, *func);
 }
 
 }
