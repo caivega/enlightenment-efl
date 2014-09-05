@@ -135,6 +135,15 @@ eolian_function_is_class(const Eolian_Function *fid)
    return fid->is_class;
 }
 
+
+EAPI Eina_Bool
+eolian_function_is_constructor(const Eolian_Function *fid, const Eolian_Class *cl)
+{
+   EINA_SAFETY_ON_NULL_RETURN_VAL(fid, EINA_FALSE);
+   return NULL != eina_list_search_sorted_list
+     (fid->ctor_of_classes, EINA_COMPARE_CB(strcmp), cl->name);
+}
+
 EAPI const Eolian_Function_Parameter *
 eolian_function_parameter_get_by_name(const Eolian_Function *fid, const char *param_name)
 {

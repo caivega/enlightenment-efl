@@ -59,6 +59,8 @@ _db_fill_implement(Eolian_Class *cl, Eolian_Implement *impl)
    else if (impl->is_prop_set)
      ftype = EOLIAN_PROP_SET;
 
+   if (!impl_name) return _func_error(cl, impl);
+
    if (impl->is_virtual)
      {
         foo_id = (Eolian_Function*)eolian_class_function_get_by_name(cl,
