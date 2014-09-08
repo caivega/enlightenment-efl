@@ -1,5 +1,7 @@
 #include "eo_parser.h"
 
+#include <assert.h>
+
 static void
 _db_fill_param(Eina_List **plist, Eo_Param_Def *param)
 {
@@ -279,11 +281,6 @@ _db_fill_implement(Eolian_Class *cl, Eolian_Implement *impl)
    else if (impl->is_prop_set)
      ftype = EOLIAN_PROP_SET;
 
-   if (!impl_name)
-     {
-        INF("XXX impl_name is null for class %s", cl->name);
-     }
-
    if (impl->is_virtual)
      {
         foo_id = (Eolian_Function*)eolian_class_function_get_by_name(cl,
@@ -331,18 +328,6 @@ _db_fill_implement(Eolian_Class *cl, Eolian_Implement *impl)
    else if (impl->is_class_ctor)
      {
         cl->class_ctor_enable = EINA_TRUE;
-        /* if (!_get_impl_func(cl, impl, ftype, &foo_id)) */
-        /*   return _func_error(cl, impl); */
-        /* if (!foo_id) */
-        /*   { */
-        /*      INF("XXX foo_id is null for %s / %s", cl->name, (impl->full_name ? impl->full_name : "<null-name-impl>")); */
-        /*      goto pasttags; */
-        /*   } */
-        /* foo_id->ctor_of_classes = */
-        /*   eina_list_sorted_insert(foo_id->ctor_of_classes, */
-        /*                           EINA_COMPARE_CB(strcmp), */
-        /*                           eina_stringshare_ref(cl->name)); */
-        /* INF("XXX Fuction %s (type=%d) marked as constructor of class %s", impl_name, (int)ftype, cl->name); */
         return 1;
      }
    else if (impl->is_class_dtor)
@@ -457,14 +442,97 @@ _db_fill_constructor(Eolian_Class *cl, Eolian_Constructor *ctor)
         eina_stringshare_del(ctor_name);
      }
 
-   Eolian_Function *foo_id = (Eolian_Function*)
-     eolian_class_function_get_by_name(cl,
-       ctor->full_name + strlen(cl->full_name) + 1, EOLIAN_UNRESOLVED);
-   foo_id->ctor_of_classes = eina_list_sorted_insert(foo_id->ctor_of_classes,
-                                                     EINA_COMPARE_CB(strcmp),
-                                                     cl->name);
-   INF("XXX Fuction %s (ctor) marked as constructor of class %s", ctor->full_name + strlen(cl->full_name) + 1, cl->name);
+   Eolian_Function *foo_id = /* XXX */
+     (Eolian_Function*) eolian_class_function_get_by_name
+     (cl, ctor->full_name + strlen(cl->full_name) + 1, EOLIAN_UNRESOLVED);
+   foo_id->ctor_of_classes = eina_list_sorted_insert
+     (foo_id->ctor_of_classes, EINA_COMPARE_CB(strcmp), cl->full_name);
    cl->constructors = eina_list_append(cl->constructors, ctor);
+}
+
+static Eina_Bool
+_impl_decompose(Eolian_Implement *impl, Eolian_Class **cls, Eolian_Function **func)
+{
+   char *cls_name = strdup(impl->full_name);
+   char *p = strrchr(cls_name, '.');
+   assert(!!p); *p = '\0';
+   Eolian_Function_Type ftype = EOLIAN_UNRESOLVED;
+   if (impl->is_prop_get) ftype = EOLIAN_PROP_GET;
+   else if (impl->is_prop_set) ftype = EOLIAN_PROP_SET;
+   Eolian_Class *cls_ = (Eolian_Class*) eolian_class_get_by_name(cls_name);
+   // XXX
+   const Eolian_Class *cls_2 = NULL;
+   database_class_name_validate(cls_name, (const Eolian_Class**)&cls_2);
+   printf("XXX validated ( cls_1: %s || cls_2: %s ) => %s\n",
+          cls_ ? cls_->full_name : "<null>", cls_2 ? cls_2->full_name : "<null>", impl->full_name);
+   // XXX
+   if (!cls_) printf("XXX class not found: %s\n", cls_name);
+   if (!cls_)
+     {
+        database_class_name_validate(cls_name, (const Eolian_Class**)&cls_);
+        printf("XXX validated class: %s\n", cls_ ? (cls_->full_name ? cls_->full_name : "<null-name>") : "<null>");
+     }
+   assert(!!cls_2);
+   Eolian_Function *func_ = (Eolian_Function*) eolian_class_function_get_by_name
+     (cls_, impl->full_name + strlen(cls_name) + 1, ftype);
+   if (cls) *cls = cls_;
+   if (func) *func = func_;
+   if (!func_)
+     {
+        printf("XXX failed : %s\n", impl->full_name);
+     }
+   free(cls_name);
+   return EINA_TRUE;
+}
+
+#if 0 //XXX
+cls_namestatic Eina_Bool
+_impl_decompose(Eolian_Implement *impl, Eolian_Class **cls, Eolian_Function **func)
+{
+   printf("XXX full-name: %s\n", impl->full_name);
+   char *s = strdup(impl->full_name);
+   char *p = strrchr(s, '.');
+   assert(!!p); *p = '\0';
+   p = strchr(s, '.');
+   assert(!!p);
+   if (p[0] == '.') ++p;
+   Eolian_Function_Type ftype = EOLIAN_UNRESOLVED;
+   if (impl->is_prop_get) ftype = EOLIAN_PROP_GET;
+   else if (impl->is_prop_set) ftype = EOLIAN_PROP_SET;
+   Eolian_Class *cls_ = (Eolian_Class*) eolian_class_get_by_name(p);
+   if (!cls_) printf("XXX class not found: %s\n", p);
+   assert(!!cls_);
+   Eolian_Function *func_ = (Eolian_Function*) eolian_class_function_get_by_name
+     (cls_, impl->full_name + strlen(p) + 1, ftype);
+   if (cls) *cls = cls_;
+   if (func) *func = func_;
+   free(s);
+   return EINA_TRUE;
+}
+#endif // XXX
+
+/* XXX */
+static Eina_Bool
+_db_fill_class_constructors(Eolian_Class *cl)
+{
+   Eolian_Implement *impl;
+   Eolian_Class *impl_cls;
+   Eolian_Function *impl_func;
+   Eina_List *l;
+   EINA_LIST_FOREACH(cl->implements, l, impl)
+     {
+        assert(_impl_decompose(impl, &impl_cls, &impl_func));
+        _impl_decompose(impl, &impl_cls, &impl_func);
+        if (impl_cls == cl) continue;
+        assert(!!impl_func);
+        if (eolian_function_is_constructor(impl_func, impl_cls))
+          {
+             impl_func->ctor_of_classes = eina_list_sorted_insert
+               (impl_func->ctor_of_classes, EINA_COMPARE_CB(strcmp),
+                eina_stringshare_ref(cl->full_name));
+          }
+     }
+   return EINA_TRUE;
 }
 
 static Eina_Bool
@@ -478,7 +546,46 @@ _db_fill_constructors(Eolian_Class *cl, Eo_Class_Def *kls)
         _db_fill_constructor(cl, ctor);
         eina_list_data_set(l, NULL); /* prevent double free */
      }
- 
+
+   _db_fill_class_constructors(cl);
+
+#if 0
+   int i=0;
+   Eolian_Implement *impl;
+   Eolian_Function *fid;
+   Eina_Iterator *itr = eolian_class_implements_get(cl);
+   EINA_ITERATOR_FOREACH(itr, impl)
+     {
+        assert(!(impl->is_prop_get && impl->is_prop_set));
+        assert(!!impl->full_name || impl->is_class_ctor || impl->is_class_dtor);
+        if (impl->full_name && !impl->is_class_ctor && !impl->is_class_dtor)
+          {
+             //eolian_class_get_by_name
+             //eolian_class_get_by_file
+             Eolian_Class *_c = (Eolian_Class*)impl->klass;
+             assert(!!_c);
+             if (!_get_impl_func(_c, impl, EOLIAN_UNRESOLVED, &fid))
+               return _func_error(cl, impl);
+             assert(!!fid);
+             printf("XXX implements(%s, %d) : impl->full_name = %s, fid->full_name = %s, ftype = %d, impl->klass = %s\n", cl->full_name, i++, impl->full_name, (fid ? fid->full_name : "<null>"), (int)(fid ? fid->type : 255), (impl->klass ? impl->klass->full_name : "<null>"));
+             printf("XXX-0\n");
+             if (eolian_function_is_constructor(fid, _c))
+               {
+                  printf("XXX-1\n");
+                  fid->ctor_of_classes =
+                    eina_list_sorted_insert(fid->ctor_of_classes,
+                                            EINA_COMPARE_CB(strcmp),
+                                            eina_stringshare_ref(cl->full_name));
+                  printf("XXX-2\n");
+                  /* printf("XXX Fuction %s (type=%d) marked as constructor of class %s (orig=%s)\n", */
+                  /*        impl->full_name, fid ? fid->type : 255, cl->full_name, impl->klass->full_name); */
+               }
+             printf("XXX-3\n");
+          }
+   }
+   eina_iterator_free(itr);
+   #endif // XXX
+
    return EINA_TRUE;
 }
 

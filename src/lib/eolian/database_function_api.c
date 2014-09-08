@@ -135,15 +135,28 @@ eolian_function_is_class(const Eolian_Function *fid)
    return fid->is_class;
 }
 
-
 EAPI Eina_Bool
 eolian_function_is_constructor(const Eolian_Function *fid, const Eolian_Class *cl)
 {
+   // XXX rename to eolian_class_function_is_constructor(cl, fid) ?
    EINA_SAFETY_ON_NULL_RETURN_VAL(fid, EINA_FALSE);
-   return fid->type == EOLIAN_METHOD &&
-     !!eina_list_search_sorted_list(fid->ctor_of_classes,
-                                    EINA_COMPARE_CB(strcmp),
-                                    cl->name);
+#if 1 // XXX
+   Eina_List *l = NULL; // XXX
+   const char *s;
+   int i=0;
+   EINA_LIST_FOREACH(fid->ctor_of_classes, l, s)
+     {
+        printf("XXX-%d fid=%s fid->ctor_of=%s || cl->name = %s \n", i, fid->name, s, cl->full_name); // XXX
+        ++i;
+     }
+   printf("XXX fid->name=%s cl->full_name=%s || func_is_ctor=%d\n", fid->name, cl->full_name,
+       (!!eina_list_search_sorted_list(fid->ctor_of_classes,
+                                       EINA_COMPARE_CB(strcmp),
+                                       cl->full_name))); // XXX
+#endif // XXX
+   return !!eina_list_search_sorted_list(fid->ctor_of_classes,
+                                         EINA_COMPARE_CB(strcmp),
+                                         cl->full_name);
 }
 
 EAPI const Eolian_Function_Parameter *

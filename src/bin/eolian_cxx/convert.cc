@@ -288,6 +288,9 @@ convert_eolian_implements(efl::eolian::eo_class& cls, Eolian_Class const& klass)
         const Eolian_Function *func = implements_function(*desc);
         assert(!!func);
         assert(!!implements_class(*desc));
+   std::cout << "<< " << __FILE__ << ">> " << __FUNCTION__ << "() +" << __LINE__ 
+             << " XXX impl.name = " << function_name(*func) << " impl.func=" << function_impl(*func, prefix) << " impl.type=" << (int)function_op_type(*func) << std::endl;
+
         if (!implements_is_visible(klass, *desc))
           continue;
         // std::string cls_name = safe_lower
