@@ -1,4 +1,4 @@
-EOS = \
+EFL_EOS = \
 	    lib/efl/interfaces/efl_control.eo \
       lib/efl/interfaces/efl_file.eo \
       lib/efl/interfaces/efl_image.eo \
@@ -6,14 +6,14 @@ EOS = \
       lib/efl/interfaces/efl_text.eo \
       lib/efl/interfaces/efl_text_properties.eo
 
-EOS_H = $(EOS:%.eo=%.eo.h)
-EOS_C = $(EOS:%.eo=%.eo.c)
+EFL_EOS_H = $(EFL_EOS:%.eo=%.eo.h)
+EFL_EOS_C = $(EFL_EOS:%.eo=%.eo.c)
 
-BUILT_SOURCES += $(EOS_C) $(EOS_H)
-EXTRA_DIST += $(EOS)
+BUILT_SOURCES += $(EFL_EOS_C) $(EFL_EOS_H)
+EXTRA_DIST += $(EFL_EOS)
 
 efleolianfilesdir = $(datadir)/eolian/include/efl-@VMAJ@
-efleolianfiles_DATA = $(EOS)
+efleolianfiles_DATA = $(EFL_EOS)
 
 lib_LTLIBRARIES += lib/efl/libefl.la
 
@@ -29,4 +29,4 @@ dist_installed_eflheaders_DATA = \
               lib/efl/Efl.h
 
 installed_eflinterfacesdir = $(includedir)/efl-@VMAJ@/interfaces
-nodist_installed_eflinterfaces_DATA = $(EOS_H)
+nodist_installed_eflinterfaces_DATA = $(EFL_EOS_H)

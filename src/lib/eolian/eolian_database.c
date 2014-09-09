@@ -217,6 +217,7 @@ eolian_eo_file_parse(const char *filepath)
    Eolian_Implement *impl;
    Eolian_Constructor *ctor;
    Eina_Bool failed_dep = EINA_FALSE;
+
    if (!class)
      {
         if (!eo_parser_database_fill(filepath, EINA_FALSE))
@@ -286,6 +287,8 @@ inherits:
              ERR("Unable to find function %s", eolian_implement_full_name_get(impl));
              goto error;
           }
+        else
+          database_implement_constructor_add(impl, class);
      }
    eina_iterator_free(itr);
    itr = eolian_class_constructors_get(class);
@@ -297,9 +300,10 @@ inherits:
              ERR("Unable to find function %s", eolian_constructor_full_name_get(ctor));
              goto error;
           }
+        else
+          database_function_constructor_add(ctor_func, ctor->klass);
      }
    eina_iterator_free(itr);
-
    return EINA_TRUE;
 
 error:

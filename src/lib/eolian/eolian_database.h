@@ -281,6 +281,7 @@ void database_class_del(Eolian_Class *cl);
 
 Eolian_Function *database_function_new(const char *function_name, Eolian_Function_Type foo_type);
 void database_function_del(Eolian_Function *fid);
+void database_function_constructor_add(Eolian_Function *func, const Eolian_Class *klass);
 
 /* func parameters */
 
@@ -290,6 +291,7 @@ void database_parameter_del(Eolian_Function_Parameter *pdesc);
 /* implements */
 
 void database_implement_del(Eolian_Implement *impl);
+void database_implement_constructor_add(Eolian_Implement *impl, const Eolian_Class *klass);
 
 /* constructors */
 

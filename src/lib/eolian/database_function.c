@@ -5,14 +5,14 @@ void
 database_function_del(Eolian_Function *fid)
 {
    Eolian_Function_Parameter *param;
-   //Eina_Stringshare *cl_name;
+   Eina_Stringshare *cls_name;
    if (!fid) return;
 
    if (fid->base.file) eina_stringshare_del(fid->base.file);
    eina_stringshare_del(fid->name);
    EINA_LIST_FREE(fid->keys, param) database_parameter_del(param);
    EINA_LIST_FREE(fid->params, param) database_parameter_del(param);
-   //EINA_LIST_FREE(fid->ctor_of_classes, cl_name) eina_stringshare_del(cl_name);
+   EINA_LIST_FREE(fid->ctor_of_classes, cls_name) eina_stringshare_del(cls_name);
    database_type_del(fid->get_ret_type);
    database_type_del(fid->set_ret_type);
    database_expr_del(fid->get_ret_val);
@@ -33,4 +33,24 @@ database_function_new(const char *function_name, Eolian_Function_Type foo_type)
    fid->name = eina_stringshare_add(function_name);
    fid->type = foo_type;
    return fid;
+}
+
+static Eina_List*
+_list_sorted_insert_no_dup(Eina_List *list, Eina_Compare_Cb func, const void *data)
+{
+   Eina_List *lnear;
+   int cmp;
+   if (!list) return eina_list_append(NULL, data);
+   lnear = eina_list_search_sorted_near_list(list, func, data, &cmp);
+   if (cmp < 0) return eina_list_append_relative_list(list, data, lnear);
+   else if (cmp > 0) return eina_list_prepend_relative_list(list, data, lnear);
+   return list;
+}
+
+void
+database_function_constructor_add(Eolian_Function *func, const Eolian_Class *klass)
+{
+   func->ctor_of_classes = _list_sorted_insert_no_dup
+     (func->ctor_of_classes, EINA_COMPARE_CB(strcmp),
+      eina_stringshare_ref(klass->full_name));
 }

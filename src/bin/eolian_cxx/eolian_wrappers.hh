@@ -47,12 +47,14 @@ class_base_file(Eolian_Class const& klass)
    return path_base(safe_str(::eolian_class_file_get(&klass)));
 }
 
+// XXX return safe_lower(.);
 inline std::string
 class_name(Eolian_Class const& klass)
 {
    return safe_str(::eolian_class_name_get(&klass));
 }
 
+// XXX deprecate
 inline std::string
 class_full_name(Eolian_Class const& klass)
 {
@@ -84,6 +86,7 @@ class_eo_name(Eolian_Class const& klass)
         default:
            break;
      }
+   // XXX use find_replace
    std::string s = class_full_name(klass) + "_" + suffix;
    std::transform(s.begin(), s.end(), s.begin(),
                   [](int c)
@@ -114,6 +117,10 @@ class_prefix(Eolian_Class const& klass)
      prefix = safe_lower(find_replace(class_full_name(klass), ".", "_"));
    assert(!prefix.empty());
    return prefix;
+   // XXX
+   // //if (!prefix.empty()) return prefix;
+   // assert(!find_replace(safe_lower(class_full_name(klass)), ".", "_").empty());
+   // return find_replace(safe_lower(class_full_name(klass)), ".", "_");
 }
 
 inline efl::eolian::eo_class::eo_class_type
@@ -178,6 +185,15 @@ constructor_function(Eolian_Constructor const& ctor)
 {
    assert(!!::eolian_constructor_function_get(&ctor));
    return * ::eolian_constructor_function_get(&ctor);
+}
+
+inline efl::eina::iterator<const Eolian_Function>
+functions_get(Eolian_Class const& cls)
+{
+   Eina_Iterator *itr = ::eolian_class_functions_get(&cls, EOLIAN_METHOD); // XXX
+   return itr
+     ? efl::eina::iterator<const Eolian_Function>(itr)
+     : efl::eina::iterator<const Eolian_Function>();
 }
 
 inline std::string
@@ -281,6 +297,15 @@ function_return_is_explicit_void(Eolian_Function const& func, getter_t func_type
    Eolian_Type const* type =
      ::eolian_function_return_type_get(&func, func_type.value);
    return !!type && type->type == EOLIAN_TYPE_VOID;
+}
+
+inline efl::eina::iterator<const Eolian_Function>
+properties_get(Eolian_Class const& cls)
+{
+   Eina_Iterator *itr = ::eolian_class_functions_get(&cls, EOLIAN_PROPERTY); // XXX
+   return itr
+     ? efl::eina::iterator<const Eolian_Function>(itr)
+     : efl::eina::iterator<const Eolian_Function>();
 }
 
 inline bool
@@ -418,25 +443,62 @@ event_list(Eolian_Class const& klass)
    return events;
 }
 
+inline efl::eina::iterator<const Eolian_Implement>
+implements_get(Eolian_Class const& cls)
+{
+   Eina_Iterator *itr = ::eolian_class_implements_get(&cls);
+   return itr
+     ? efl::eina::iterator<const Eolian_Implement>(itr)
+     : efl::eina::iterator<const Eolian_Implement>();
+}
+
+inline bool
+implement_is_property_get(Eolian_Implement const& impl)
+{
+   return ::eolian_implement_is_prop_get(&impl);
+}
+
+inline bool
+implement_is_property_set(Eolian_Implement const& impl)
+{
+   return ::eolian_implement_is_prop_set(&impl);
+}
+
+inline bool
+implement_is_property(Eolian_Implement const& impl)
+{
+   return implement_is_property_get(impl) ||
+     implement_is_property_set(impl);
+}
+
 inline Eolian_Function const*
-implements_function(Eolian_Implement const& impl)
+implement_function(Eolian_Implement const& impl)
 {
    return ::eolian_implement_function_get(&impl, nullptr);
 }
 
 inline Eolian_Class const*
-implements_class(Eolian_Implement const& impl)
+implement_class(Eolian_Implement const& impl)
 {
    return ::eolian_implement_class_get(&impl);
 }
 
+// XXX This function sucks and should not exist. Eolian should
+// provide some way to determine if a method is a destructor.
 inline bool
-implements_is_visible(Eolian_Class const& cls, Eolian_Implement const& impl)
+implement_is_destructor(Eolian_Implement const& impl)
 {
-   const Eolian_Function *func = implements_function(impl);
-   std::cout << "XXX " << class_full_name(cls) << " != " << class_full_name(*implements_class(impl)) << " ? R = "<< (class_full_name(cls) != class_full_name(*implements_class(impl))) << " implements_is_visible => " << (class_full_name(cls) != class_full_name(*implements_class(impl)) && function_is_visible(*func) && function_is_constructor(cls, *func)) << std::endl;
-   return class_full_name(cls) != class_full_name(*implements_class(impl)) &&
-     function_is_visible(*func) && function_is_constructor(cls, *func);
+   return !safe_str
+     (::eolian_implement_full_name_get(&impl)).compare("Eo.Base.destructor");
+}
+
+inline bool
+implement_is_visible(Eolian_Implement const& impl)
+{
+   return function_is_visible(*implement_function(impl)) &&
+     !::eolian_implement_is_virtual(&impl) &&
+     !::eolian_implement_is_empty(&impl) &&
+     !implement_is_destructor(impl);
 }
 
 }
