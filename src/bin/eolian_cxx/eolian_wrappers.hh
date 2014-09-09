@@ -47,12 +47,14 @@ class_base_file(Eolian_Class const& klass)
    return path_base(safe_str(::eolian_class_file_get(&klass)));
 }
 
+// XXX return safe_lower(.);
 inline std::string
 class_name(Eolian_Class const& klass)
 {
    return safe_str(::eolian_class_name_get(&klass));
 }
 
+// XXX deprecate
 inline std::string
 class_full_name(Eolian_Class const& klass)
 {
@@ -84,6 +86,7 @@ class_eo_name(Eolian_Class const& klass)
         default:
            break;
      }
+   // XXX use find_replace
    std::string s = class_full_name(klass) + "_" + suffix;
    std::transform(s.begin(), s.end(), s.begin(),
                   [](int c)
@@ -114,6 +117,10 @@ class_prefix(Eolian_Class const& klass)
      prefix = safe_lower(find_replace(class_full_name(klass), ".", "_"));
    assert(!prefix.empty());
    return prefix;
+   // XXX
+   // //if (!prefix.empty()) return prefix;
+   // assert(!find_replace(safe_lower(class_full_name(klass)), ".", "_").empty());
+   // return find_replace(safe_lower(class_full_name(klass)), ".", "_");
 }
 
 inline efl::eolian::eo_class::eo_class_type
@@ -434,9 +441,9 @@ inline bool
 implements_is_visible(Eolian_Class const& cls, Eolian_Implement const& impl)
 {
    const Eolian_Function *func = implements_function(impl);
-   std::cout << "XXX " << class_full_name(cls) << " != " << class_full_name(*implements_class(impl)) << " ? R = "<< (class_full_name(cls) != class_full_name(*implements_class(impl))) << " implements_is_visible => " << (class_full_name(cls) != class_full_name(*implements_class(impl)) && function_is_visible(*func) && function_is_constructor(cls, *func)) << std::endl;
-   return class_full_name(cls) != class_full_name(*implements_class(impl)) &&
-     function_is_visible(*func) && function_is_constructor(cls, *func);
+   std::cout << "XXX " << class_full_name(cls) << " != " << class_full_name(*implements_class(impl)) << " ? R = "<< (class_full_name(cls) != class_full_name(*implements_class(impl))) << " implements_is_visible => " << (class_full_name(cls) != class_full_name(*implements_class(impl)) && function_is_visible(*func) && function_is_constructor(cls, *func)) << " function_is_visible => " << function_is_visible(*func) << std::endl;
+   return function_is_visible(*func) && /* XXX */ function_is_constructor(cls, *func) &&
+     class_full_name(cls) != class_full_name(*implements_class(impl));
 }
 
 }
