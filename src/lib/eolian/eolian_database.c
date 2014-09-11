@@ -307,7 +307,7 @@ inherits:
              goto error;
           }
         else
-          database_function_constructor_add(ctor_func, ctor->klass);
+          database_function_constructor_add((Eolian_Function*)ctor_func, ctor->klass);
      }
    eina_iterator_free(itr);
    return EINA_TRUE;

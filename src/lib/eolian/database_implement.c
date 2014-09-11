@@ -13,7 +13,6 @@ database_implement_del(Eolian_Implement *impl)
 void
 database_implement_constructor_add(Eolian_Implement *impl, const Eolian_Class *klass)
 {
-   Eolian_Function *func = (Eolian_Function*) impl->foo_id;
    if (eolian_function_is_constructor(impl->foo_id, impl->klass))
-     database_function_constructor_add(impl->foo_id, klass);
+     database_function_constructor_add((Eolian_Function*)impl->foo_id, klass);
 }
