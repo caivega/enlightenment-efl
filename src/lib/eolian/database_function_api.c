@@ -141,7 +141,7 @@ eolian_function_is_constructor(const Eolian_Function *fid, const Eolian_Class *k
    EINA_SAFETY_ON_NULL_RETURN_VAL(fid, EINA_FALSE);
    Eina_Stringshare *s = eina_stringshare_ref(klass->full_name);
    Eina_Bool r = !!eina_list_search_sorted_list
-     (fid->ctor_of_classes, EINA_COMPARE_CB(strcmp), s);
+     (fid->ctor_of, EINA_COMPARE_CB(strcmp), s);
    eina_stringshare_del(s);
    return r;
 }
