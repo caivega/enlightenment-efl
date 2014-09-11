@@ -36,21 +36,27 @@ database_function_new(const char *function_name, Eolian_Function_Type foo_type)
 }
 
 static Eina_List*
-_list_sorted_insert_no_dup(Eina_List *list, Eina_Compare_Cb func, const void *data)
+_list_sorted_insert_no_dup(Eina_List *l, Eina_Compare_Cb func, const void *data)
 {
    Eina_List *lnear;
    int cmp;
-   if (!list) return eina_list_append(NULL, data);
-   lnear = eina_list_search_sorted_near_list(list, func, data, &cmp);
-   if (cmp < 0) return eina_list_append_relative_list(list, data, lnear);
-   else if (cmp > 0) return eina_list_prepend_relative_list(list, data, lnear);
-   return list;
+
+   if (!l)
+     return eina_list_append(NULL, data);
+   else
+     lnear = eina_list_search_sorted_near_list(l, func, data, &cmp);
+
+   if (cmp < 0)
+     return eina_list_append_relative_list(l, data, lnear);
+   else if (cmp > 0)
+     return eina_list_prepend_relative_list(l, data, lnear);
+   return l;
 }
 
 void
-database_function_constructor_add(Eolian_Function *func, const Eolian_Class *klass)
+database_function_constructor_add(Eolian_Function *func, const Eolian_Class *cls)
 {
    func->ctor_of_classes = _list_sorted_insert_no_dup
      (func->ctor_of_classes, EINA_COMPARE_CB(strcmp),
-      eina_stringshare_ref(klass->full_name));
+      eina_stringshare_ref(cls->full_name));
 }
