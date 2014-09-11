@@ -12,7 +12,7 @@ database_function_del(Eolian_Function *fid)
    eina_stringshare_del(fid->name);
    EINA_LIST_FREE(fid->keys, param) database_parameter_del(param);
    EINA_LIST_FREE(fid->params, param) database_parameter_del(param);
-   EINA_LIST_FREE(fid->ctor_of_classes, cls_name) eina_stringshare_del(cls_name);
+   EINA_LIST_FREE(fid->ctor_of, cls_name) eina_stringshare_del(cls_name);
    database_type_del(fid->get_ret_type);
    database_type_del(fid->set_ret_type);
    database_expr_del(fid->get_ret_val);
@@ -56,7 +56,7 @@ _list_sorted_insert_no_dup(Eina_List *l, Eina_Compare_Cb func, const void *data)
 void
 database_function_constructor_add(Eolian_Function *func, const Eolian_Class *cls)
 {
-   func->ctor_of_classes = _list_sorted_insert_no_dup
-     (func->ctor_of_classes, EINA_COMPARE_CB(strcmp),
+   func->ctor_of = _list_sorted_insert_no_dup
+     (func->ctor_of, EINA_COMPARE_CB(strcmp),
       eina_stringshare_ref(cls->full_name));
 }
