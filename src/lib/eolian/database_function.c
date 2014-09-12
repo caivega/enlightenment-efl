@@ -25,3 +25,29 @@ database_function_del(Eolian_Function *fid)
    if (fid->set_return_comment) eina_stringshare_del(fid->set_return_comment);
    free(fid);
 }
+
+static Eina_List*
+_list_sorted_insert_no_dup(Eina_List *l, Eina_Compare_Cb func, const void *data)
+{
+   Eina_List *lnear;
+   int cmp;
+
+   if (!l)
+     return eina_list_append(NULL, data);
+   else
+     lnear = eina_list_search_sorted_near_list(l, func, data, &cmp);
+
+   if (cmp < 0)
+     return eina_list_append_relative_list(l, data, lnear);
+   else if (cmp > 0)
+     return eina_list_prepend_relative_list(l, data, lnear);
+   return l;
+}
+
+void
+database_function_constructor_add(Eolian_Function *func, const Eolian_Class *cls)
+{
+   func->ctor_of = _list_sorted_insert_no_dup
+     (func->ctor_of, EINA_COMPARE_CB(strcmp),
+      eina_stringshare_ref(cls->full_name));
+}
