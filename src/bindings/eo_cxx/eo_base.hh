@@ -130,6 +130,13 @@ struct base
       detail::parent_set(_eo_raw, parent._eo_ptr());
    }
 
+   /// @brief Set the parent of this object to NULL.
+   ///
+   void parent_set(std::nullptr_t)
+   {
+      detail::parent_set(_eo_raw, NULL);
+   }
+
    /// @brief Get the parent of this object.
    ///
    /// @return An @ref efl::eo::base instance that binds the parent

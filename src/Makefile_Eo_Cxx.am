@@ -20,4 +20,42 @@ bindings/eo_cxx/eo_inherit_bindings.hh \
 bindings/eo_cxx/Eo.hh \
 bindings/eo_cxx/eo_cxx_interop.hh
 
+### Unit tests
+
+if EFL_ENABLE_TESTS
+
+check_PROGRAMS += tests/eo_cxx/eo_cxx_suite
+TESTS += tests/eo_cxx/eo_cxx_suite
+
+tests_eo_cxx_eo_cxx_suite_SOURCES = \
+tests/eo_cxx/eo_cxx_suite.cc \
+tests/eo_cxx/eo_cxx_test_ref.cc \
+tests/eo_cxx/simple.c
+
+tests/eo_cxx/tests_eo_cxx_eo_cxx_suite-eo_cxx_test_ref.$(OBJEXT): tests/eo_cxx/simple.eo.h
+tests/eo_cxx/tests_eo_cxx_eo_cxx_suite-simple.$(OBJEXT): tests/eo_cxx/simple.c tests/eo_cxx/simple.eo.c tests/eo_cxx/simple.eo.h
+
+CLEANFILES += tests/eo_cxx/simple.eo.c tests/eo_cxx/simple.eo.h tests/eo_cxx/simple.eo.hh
+EXTRA_DIST += tests/eo_cxx/callback.eo
+
+tests_eo_cxx_eo_cxx_suite_CXXFLAGS = -I$(top_builddir)/src/lib/efl \
+-I$(top_builddir)/src/lib/eo \
+-I$(top_srcdir)/src/lib/eo \
+-I$(top_srcdir)/src/bindings/eo_cxx \
+-I$(top_srcdir)/src/tests/eo_cxx \
+-I$(top_builddir)/src/tests/eo_cxx \
+-DTESTS_WD=\"`pwd`\" \
+-DTESTS_SRC_DIR=\"$(top_srcdir)/src/tests/eo_cxx\" \
+-DPACKAGE_BUILD_DIR=\"$(abs_top_builddir)/src/tests/eo_cxx\" \
+-DTESTS_BUILD_DIR=\"$(top_builddir)/src/tests/eo_cxx\" \
+@CHECK_CFLAGS@ \
+@EO_CFLAGS@ \
+@EO_CXX_CFLAGS@ \
+@EINA_CXX_CFLAGS@
+
+tests_eo_cxx_eo_cxx_suite_CFLAGS = ${tests_eo_cxx_eo_cxx_suite_CXXFLAGS}
+tests_eo_cxx_eo_cxx_suite_LDADD = @CHECK_LIBS@ @USE_EINA_LIBS@ @USE_EO_LIBS@
+tests_eo_cxx_eo_cxx_suite_DEPENDENCIES = @USE_EINA_INTERNAL_LIBS@ @USE_EO_INTERNAL_LIBS@
+
+endif
 endif
